@@ -1,0 +1,7 @@
+Test version: licensing is off, every feature is unlocked.
+
+- Ribbon layout, File drop-down menu, one page per Options section
+- English interface
+- Fix: first-run setup no longer crashes on PCs with a Windows printer
+
+Built from source 5ce1b69.
