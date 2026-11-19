@@ -1,0 +1,30 @@
+name: Publish release
+
+# Push an installer plus notes.txt to the "incoming" branch; this creates the GitHub release
+# (tag v<version> taken from the file name) that the app's update check reads.
+on:
+  push:
+    branches: [incoming]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          f=$(ls incoming/LabelDesignPro-Setup-*.exe | head -1)
+          v=$(basename "$f" .exe | sed 's/LabelDesignPro-Setup-//')
+          notes=incoming/notes.txt
+          echo "sha256: $(sha256sum "$f" | cut -d' ' -f1)" >> "$notes"
+          if gh release view "v$v" >/dev/null 2>&1; then
+            gh release upload "v$v" "$f" --clobber
+            gh release edit "v$v" --notes-file "$notes"
+          else
+            gh release create "v$v" "$f" --target main --title "Label Design Pro $v (test version)" --notes-file "$notes"
+          fi
